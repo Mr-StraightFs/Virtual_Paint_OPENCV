@@ -41,6 +41,18 @@ def detectColor(img,Colors,ColorValues):
         cv2.imshow(str(clr[0]),mask) #show mask
     return newPoints
 
+# Define the GetContours Function : Recognizes the egdes and draw a rectangular Contour
+def getContours(img):
+    contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    x,y,w,h = 0,0,0,0
+    for ct in contours:
+        area = cv2.contourArea(ct)
+        if area>500:
+            cv2.drawContours(imgOutput, ct, -1, (255, 0, 0), 3)
+            peri = cv2.arcLength(ct,True)
+            approx = cv2.approxPolyDP(ct,0.02*peri,True)
+            x, y, w, h = cv2.boundingRect(approx)
+    return x+w//2,y
 
 # Webcam Live Video Capture Loop : (Type q to stop)
 while True:
