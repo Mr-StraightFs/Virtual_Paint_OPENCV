@@ -16,16 +16,16 @@ Colors = [[5,107,0,19,255,255],
             [133,56,0,159,156,255],
             [57,76,0,100,255,255],
             [90,48,0,118,255,255]]
-# The color RBG Values , respectively :
-ColorValues = [[51,153,255],
+
+ColorValues = [[51,153,255],  # The color RBG Values
                  [255,0,255],
                  [0,255,0],
                  [255,0,0]]
 
 myPoints = []  ## Three dimentional np array with [x , y , colorId ]
 
-# Detect Color Function
-def detectColor(img,Colors,ColorValues):
+
+def detectColor(img,Colors,ColorValues):  # Detect Color Function
     imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)  #Converting to the HSV color enviroment
     count = 0
     newPoints=[]
@@ -41,8 +41,8 @@ def detectColor(img,Colors,ColorValues):
         cv2.imshow(str(clr[0]),mask) #show mask
     return newPoints
 
-# Define the GetContours Function : Recognizes the egdes and draw a rectangular Contour
-def getContours(img):
+
+def getContours(img):  # Define the GetContours Function : Recognizes the egdes and draw a rectangular Contour
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     x,y,w,h = 0,0,0,0
     for ct in contours:
@@ -54,8 +54,12 @@ def getContours(img):
             x, y, w, h = cv2.boundingRect(approx)
     return x+w//2,y
 
-# Webcam Live Video Capture Loop : (Type q to stop)
-while True:
+def drawOnCam(myPoints, ColorValues):  # This function outputs the results on the live webcam screen
+    for point in myPoints:
+        cv2.circle(imgOutput, (point[0], point[1]), 10, ColorValues[point[2]], cv2.FILLED)
+
+
+while True:   # Webcam Live Video Capture Loop : (Type q to stop)
     success, img = cap.read()
     if img is None or (cv2.waitKey(1) & 0xFF == ord('q')):
         break
