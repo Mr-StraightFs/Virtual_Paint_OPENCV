@@ -38,7 +38,7 @@ def detectColor(img,Colors,ColorValues):  # Detect Color Function
         if x!=0 and y!=0:
             newPoints.append([x,y,count])
         count +=1
-        cv2.imshow(str(clr[0]),mask) #show mask
+        cv2.imshow(str(clr[0]),mask)   #show all the masks
     return newPoints
 
 
@@ -63,4 +63,13 @@ while True:   # Webcam Live Video Capture Loop : (Type q to stop)
     success, img = cap.read()
     if img is None or (cv2.waitKey(1) & 0xFF == ord('q')):
         break
-    cv2.imshow("Result", img)
+    imgOutput = img.copy()
+    newPoints = detectColor(img, Colors, ColorValues)
+    if len(newPoints) != 0:
+        for newP in newPoints:
+            myPoints.append(newP)
+    if len(myPoints) != 0:
+        drawOnCam(myPoints, ColorValues)
+
+    # Finally : Output the result on the screen
+    cv2.imshow("Result", imgOutput)
