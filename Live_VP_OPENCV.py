@@ -24,6 +24,23 @@ ColorValues = [[51,153,255],
 
 myPoints = []  ## Three dimentional np array with [x , y , colorId ]
 
+# Detect Color Function
+def detectColor(img,Colors,ColorValues):
+    imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)  #Converting to the HSV color enviroment
+    count = 0
+    newPoints=[]
+    for clr in Colors:
+        lower = np.array(clr[0:3])
+        upper = np.array(clr[3:6])
+        mask = cv2.inRange(imgHSV,lower,upper)
+        x,y=getContours(mask)
+        cv2.circle(imgOutput,(x,y),15,ColorValues[count],cv2.FILLED)
+        if x!=0 and y!=0:
+            newPoints.append([x,y,count])
+        count +=1
+        cv2.imshow(str(clr[0]),mask) #show mask
+    return newPoints
+
 
 # Webcam Live Video Capture Loop : (Type q to stop)
 while True:
