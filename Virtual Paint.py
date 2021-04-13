@@ -4,7 +4,7 @@ import numpy as np
 # set up the video window frame's size
 frameWd = 640
 frameHeight = 480
-cap = cv2.VideoCapture(1) # Set u the video capture speed
+cap = cv2.VideoCapture(0)  # Set u the video capture speed
 cap.set(3, frameWd)
 cap.set(4, frameHeight)
 cap.set(10,100)           # set up the brightness level
@@ -17,14 +17,14 @@ myColors = [[5,107,0,19,255,255],
             [57,76,0,100,255,255],
             [90,48,0,118,255,255]]
 # The color RBG Values , respectively :
-myColorValues = [[51,153,255],
+ColorValues = [[51,153,255],
                  [255,0,255],
                  [0,255,0],
                  [255,0,0]]
 
-myPoints =  []  ## Three dimentional np array with [x , y , colorId ]
+myPoints = []  ## Three dimentional np array with [x , y , colorId ]
 
-def findColor(img,myColors,myColorValues):
+def findColor(img,myColors,ColorValues):
     imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)  #Converting to the HSV color enviroment
     count = 0
     newPoints=[]
@@ -33,7 +33,7 @@ def findColor(img,myColors,myColorValues):
         upper = np.array(color[3:6])
         mask = cv2.inRange(imgHSV,lower,upper)
         x,y=getContours(mask)
-        cv2.circle(imgResult,(x,y),15,myColorValues[count],cv2.FILLED)
+        cv2.circle(imgOutput,(x,y),15,ColorValues[count],cv2.FILLED)
         if x!=0 and y!=0:
             newPoints.append([x,y,count])
         count +=1
@@ -46,28 +46,29 @@ def getContours(img):
     for cnt in contours:
         area = cv2.contourArea(cnt)
         if area>500:
-            #cv2.drawContours(imgResult, cnt, -1, (255, 0, 0), 3)
+            cv2.drawContours(imgOutput, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
             x, y, w, h = cv2.boundingRect(approx)
     return x+w//2,y
 
-def drawOnCanvas(myPoints,myColorValues):
+def drawOnCanvas(myPoints, ColorValues):
     for point in myPoints:
-        cv2.circle(imgResult, (point[0], point[1]), 10, myColorValues[point[2]], cv2.FILLED)
-
+        cv2.circle(imgOutput, (point[0], point[1]), 10, ColorValues[point[2]], cv2.FILLED)
 
 while True:
     success, img = cap.read()
-    imgResult = img.copy()
-    newPoints = findColor(img, myColors,myColorValues)
+    if img is None:
+        break
+    imgOutput = img.copy()
+    newPoints = findColor(img, myColors,ColorValues)
     if len(newPoints)!=0:
         for newP in newPoints:
             myPoints.append(newP)
     if len(myPoints)!=0:
-        drawOnCanvas(myPoints,myColorValues)
+        drawOnCanvas(myPoints,ColorValues)
 
-
-    cv2.imshow("Result", imgResult)
+# Finally : Output the result on the screen
+    cv2.imshow("Result", imgOutput)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
